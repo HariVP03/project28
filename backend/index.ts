@@ -13,16 +13,16 @@ app.use(
   express.static(path.join(__dirname, "/../frontend/.next/server/pages"))
 );
 
-app.get("/", (req: Request, res: Response) => {
+app.get("*", (_, res: Response) => {
   res.sendFile(
     path.join(__dirname, "/../frontend/.next/server/pages", "index.html")
   );
 });
 
-app.get("/haha", async (req: Request, res: Response) => {
-  const users = await prisma.user.findMany();
+app.post("/createUser", async (_, res: Response) => {
+  // const users = await prisma.user.findMany();
   // return users;
-  console.log({ users });
+  console.log(res);
 });
 
 server.listen(port, () => {
