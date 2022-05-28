@@ -1,6 +1,6 @@
-const express = require("express");
-const http = require("http");
-const path = require("path");
+import express, { Response, Request } from "express";
+import http from "http";
+import path from "path";
 
 const port = process.env.PORT || 3000;
 
@@ -11,7 +11,7 @@ app.use(
   express.static(path.join(__dirname, "/../frontend/.next/server/pages"))
 );
 
-app.get("*", (req, res) => {
+app.get("*", (req: Request, res: Response) => {
   res.sendFile(
     path.join(__dirname, "/../frontend/.next/server/pages", "index.html")
   );
