@@ -1,15 +1,28 @@
 import { Avatar, Button, Flex, Input } from "@chakra-ui/react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { useRouter } from "next/router";
-import { useState } from "react";
+import Router from "next/router";
+import { LegacyRef, Suspense, useRef, useState } from "react";
 import ReactPainter from "react-painter";
 import { storage } from "src/firebase";
+import CanvasDraw from "react-canvas-draw";
 
 const Draw: React.FC = () => {
-    const router = useRouter();
+    function dataURLtoBlob(dataurl: any) {
+        const arr = dataurl.split(","),
+            mime = arr[0].match(/:(.*?);/)[1],
+            bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new Blob([u8arr], { type: mime });
+    }
+
     const auth = getAuth();
     const user = auth.currentUser;
+    const canvas = useRef<LegacyRef<CanvasDraw> | undefined>();
     const [paintingName, setPaintingName] = useState<string | undefined>();
 
     const onSave = (blob: Blob) => {
@@ -19,9 +32,8 @@ const Draw: React.FC = () => {
                 Math.random() * 100000,
             )}/image`,
         );
-        // const paintingFile = new File([blob], "paintingFile");
 
-        // console.log(paintingFile);
+        // const file = new File([blob], "file.png");
 
         uploadBytes(paintingRef, blob)
             .then((snap) => getDownloadURL(snap.ref))
@@ -30,46 +42,53 @@ const Draw: React.FC = () => {
 
     onAuthStateChanged(auth, (res) => {
         if (!res) {
-            router.push("/");
+            if (process.browser) {
+                //Runs only on client side
+
+                Router.push("/");
+            }
         }
     });
 
     return (
         <Flex bg="gray.800" w="100vw" h="100vh" justify="center" align="center">
-            <ReactPainter
-                width={500}
-                height={500}
-                onSave={(blob) => {
-                    console.log("Started");
-                    console.log(blob);
-                    onSave(blob);
-                    console.log("Ended");
-                }}
-                render={({ triggerSave, canvas }) => (
-                    <Flex gap={5} direction="column" align="center">
-                        <Flex align="center" gap={3}>
-                            <Button onClick={triggerSave}>Save</Button>
-                            <Avatar src={user?.photoURL || ""} />
-                        </Flex>
-                        <Input
-                            value={paintingName}
-                            onChange={(e) => setPaintingName(e.target.value)}
-                            color="white"
-                            placeholder="Name of the painting"
-                        />
-                        <Flex
-                            rounded="none"
-                            h="500px"
-                            w="500px"
-                            bg="white"
-                            border="2px solid"
-                            borderColor="gray.600"
-                        >
-                            {canvas}
-                        </Flex>
-                    </Flex>
-                )}
-            />
+            <Flex gap={5} direction="column" align="center">
+                <Flex align="center" gap={3}>
+                    <Button
+                        onClick={() => {
+                            const r = (canvas.current as any)?.getDataURL(
+                                "image/png",
+                            );
+                            console.log(dataURLtoBlob(r));
+                            onSave(dataURLtoBlob(r));
+                        }}
+                    >
+                        Save
+                    </Button>
+                    <Avatar src={user?.photoURL || ""} />
+                </Flex>
+                <Input
+                    value={paintingName}
+                    onChange={(e) => setPaintingName(e.target.value)}
+                    color="white"
+                    placeholder="Name of the painting"
+                />
+                <Flex
+                    rounded="none"
+                    h="500px"
+                    w="500px"
+                    bg="white"
+                    border="2px solid"
+                    borderColor="gray.600"
+                >
+                    {/* {canvas} */}
+                    <CanvasDraw
+                        canvasHeight="500px"
+                        canvasWidth="500px"
+                        ref={canvas as any}
+                    />
+                </Flex>
+            </Flex>
         </Flex>
     );
 };
