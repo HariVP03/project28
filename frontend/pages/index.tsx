@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Button, Flex } from "@chakra-ui/react";
-import { onAuthStateChanged, signInWithPopup } from "firebase/auth";
-import { auth, googleProvider } from "src/firebase";
+import { getAuth, onAuthStateChanged, signInWithPopup } from "firebase/auth";
+import { googleProvider } from "src/firebase";
 import { useRouter } from "next/router";
 
 const Home: React.FC = () => {
     const route = useRouter();
     const [loading, setLoading] = useState<boolean>(true);
+    const auth = getAuth();
 
     onAuthStateChanged(auth, (res) => {
         setLoading(false);

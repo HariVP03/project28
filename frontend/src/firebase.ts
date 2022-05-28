@@ -1,34 +1,25 @@
 // Import the functions you need from the SDKs you need
 
 import { initializeApp } from "firebase/app";
-import {getAuth, GoogleAuthProvider} from "firebase/auth"
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { getStorage } from "firebase/storage";
 
+// Import the functions you need from the SDKs you need
 // TODO: Add SDKs for Firebase products that you want to use
-
 // https://firebase.google.com/docs/web/setup#available-libraries
 
-
 // Your web app's Firebase configuration
-
 const firebaseConfig = {
-
-  apiKey: "AIzaSyDDOxlkjeNiz5RWQ-zwKPkZf5PTFO_jFEM",
-
-  authDomain: "project28-3db35.firebaseapp.com",
-
-  projectId: "project28-3db35",
-
-  storageBucket: "project28-3db35.appspot.com",
-
-  messagingSenderId: "1006191829726",
-
-  appId: "1:1006191829726:web:fed6fab764530b9dfe184f"
-
+    apiKey: "AIzaSyCSg-NLWzqpZHC-8qE92ieVuVO3Tfp5RqA",
+    authDomain: "project28-paint.firebaseapp.com",
+    projectId: "project28-paint",
+    storageBucket: "project28-paint.appspot.com",
+    messagingSenderId: "997423421572",
+    appId: "1:997423421572:web:24166d2a70697b126c8ad1",
 };
 
-
 // Initialize Firebase
-
 const app = initializeApp(firebaseConfig);
 export const googleProvider = new GoogleAuthProvider();
-export const auth = getAuth();
+// export const auth = getAuth();
+export const storage = getStorage();
