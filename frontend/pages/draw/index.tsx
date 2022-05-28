@@ -6,6 +6,7 @@ import { LegacyRef, Suspense, useRef, useState } from "react";
 import ReactPainter from "react-painter";
 import { storage } from "src/firebase";
 import CanvasDraw from "react-canvas-draw";
+import axios from "axios";
 
 const Draw: React.FC = () => {
     function dataURLtoBlob(dataurl: any) {
@@ -24,8 +25,10 @@ const Draw: React.FC = () => {
     const user = auth.currentUser;
     const canvas = useRef<LegacyRef<CanvasDraw> | undefined>();
     const [paintingName, setPaintingName] = useState<string | undefined>();
+    const [loading, setLoading] = useState<boolean>(false);
 
     const onSave = (blob: Blob) => {
+        setLoading(true);
         const paintingRef = ref(
             storage,
             `/paintings/${user?.uid}/${paintingName}/${Math.ceil(
@@ -33,11 +36,19 @@ const Draw: React.FC = () => {
             )}/image`,
         );
 
-        // const file = new File([blob], "file.png");
-
         uploadBytes(paintingRef, blob)
             .then((snap) => getDownloadURL(snap.ref))
-            .then((url) => console.log(url));
+            .then((url) => {
+                axios
+                    .post("/api/createPainting", {
+                        name: paintingName,
+                        url,
+                        email: auth.currentUser?.email,
+                    })
+                    .then(() => {
+                        setLoading(false);
+                    });
+            });
     };
 
     onAuthStateChanged(auth, (res) => {
@@ -55,6 +66,7 @@ const Draw: React.FC = () => {
             <Flex gap={5} direction="column" align="center">
                 <Flex align="center" gap={3}>
                     <Button
+                        isLoading={loading}
                         onClick={() => {
                             const r = (canvas.current as any)?.getDataURL(
                                 "image/png",
@@ -81,7 +93,6 @@ const Draw: React.FC = () => {
                     border="2px solid"
                     borderColor="gray.600"
                 >
-                    {/* {canvas} */}
                     <CanvasDraw
                         canvasHeight="500px"
                         canvasWidth="500px"

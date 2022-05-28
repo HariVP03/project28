@@ -23,7 +23,9 @@
         "react": "17.0.2",
         "react-canvas-draw": "^1.2.1",
         "react-dom": "17.0.2",
+        "react-fabricjs-whiteboard": "^1.1.14",
         "react-painter": "^0.4.0",
+        "react-sketch": "^0.5.1",
         "recoil": "^0.1.2",
         "sass": "^1.32.5"
     },
